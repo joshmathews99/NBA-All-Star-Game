@@ -1,0 +1,41 @@
+---
+title: "Milestone 3: About My Final Project"
+author: "Josh Mathews"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About
+
+For my final project, I would like to analyze box score data from various
+National Basketball Association All Star games and compare game outcomes with
+the corresponding results of fan voting for All Star Game starters. The purpose
+of doing so is to explore whether there exist relationships between the
+popularity of particular players among those fans of the game who choose to vote
+for their favourite players and the performance of such players in the game
+itself. Furthermore, in regards to the most recent All Star Game, one question I
+would like to consider is whether the box score is able to relate to how
+entertaining a particular game is. The reason for asking such a question is
+because of how much more entertaining the 2020 edition was compared to past
+editions.
+
+In order to address these various questions, I began by searching for data
+related to the NBA and potential datasets that had already been put together.
+One such package containing very extensive data relating to the NBA was the
+nbastatR package. I installed and used this package to, primarily, obtain box
+score results of All Star Games over the years. However, this package, to my
+knowledge, did not contain information on the fan voting results for each player
+and so, to obtain this data, I manually harvested it from the Basketball
+Reference website, grouped, cleaned, and joined it to its respective All Star
+Game box score. This new dataset containing data from two different sources will
+then be used to answer the primary question of interest regarding whether
+relationships exist between the popularity of a player among NBA fans and their
+performance in the All Star Game itself.
+
+Below is a link to the preliminary data that I have collected and would like to
+use for the final project. I am hoping to add more and more data to analyze as
+part of this project over time. 
+https://github.com/joshmathews99/final_project
