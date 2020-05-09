@@ -1,0 +1,88 @@
+---
+title: "Gathering Data"
+author: "Josh Mathews"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load nbastatR package and necessary packages. The nbastatR package contains
+# data on many pieces of information related to the NBA. It is from here that I
+# will obtain box score data and potentially shot log data for All Star Games.
+
+devtools::install_github("abresler/nbastatR")
+library(nbastatR)
+library(future)
+library(tidyverse)
+library(ggplot2)
+library(janitor)
+library(rvest)
+```
+
+```{r, include=FALSE}
+
+# Harvest Data from Basketball Reference on All Star Voting. All Star voting
+# data does not seem to exist in the nbastatR package and so, I will need to
+# harvest this from online sources.
+# 1. Obtain a tibble of the data from each conference, frontcourt/backcourt.
+# 2. Merge these tibbles to the corresponding game_logs tibble for each
+# respective All Star Game by year.
+
+# Create a function to scrape data and save it as a csv.
+bref_allstar_voting <- function(x) {
+n <- read_html(x)
+n <- n %>%
+  html_nodes("table")
+n <- n[[1]] %>%
+  html_table()
+write_csv(n, 'n.csv')
+y <- read_csv('n.csv', skip = 1) %>% 
+  clean_names() %>% 
+  select(player, votes)
+}
+
+# 2020 All Star Game
+# This process of obtaining voting data for each conference (east/west) and
+# positional category (frontcourt/backcourt), merging the four tibbles together
+# and then joining it to the box scores from that year's All Star game will be
+# repeated for each year.
+
+y2020ef <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2020_voting-frontcourt-eastern-conference.html")
+y2020eb <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2020_voting-backcourt-eastern-conference.html")
+y2020wf <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2020_voting-frontcourt-western-conference.html")
+y2020wb <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2020_voting-backcourt-western-conference.html")
+y2020voting <- rbind(y2020ef, y2020eb, y2020wf, y2020wb)
+y2020game <- game_logs(season = 2020, season_types = "All Star") %>% 
+  mutate(namePlayer = replace(namePlayer, namePlayer == "Luka Doncic", "Luka Dončić")) %>% 
+  mutate(namePlayer = replace(namePlayer, namePlayer == "Nikola Jokic", "Nikola Jokić"))
+y2020 <- y2020game %>% 
+  left_join(y2020voting, by = c("namePlayer" = "player"))
+
+# 2019 All Star Game
+
+y2019ef <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2019_voting-frontcourt-eastern-conference.html")
+y2019eb <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2019_voting-backcourt-eastern-conference.html")
+y2019wf <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2019_voting-frontcourt-western-conference.html")
+y2019wb <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2019_voting-backcourt-western-conference.html")
+y2019voting <- rbind(y2019ef, y2019eb, y2019wf, y2019wb)
+y2019game <- game_logs(season = 2019, season_types = "All Star") %>% 
+  mutate(namePlayer = replace(namePlayer, namePlayer == "Nikola Jokic", "Nikola Jokić")) %>% 
+  mutate(namePlayer = replace(namePlayer, namePlayer == "Nikola Vucevic", "Nikola Vučević"))
+y2019 <- y2019game %>% 
+  left_join(y2019voting, by = c("namePlayer" = "player"))
+
+# 2018 All Star Game
+
+y2018ef <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2018_voting-frontcourt-eastern-conference.html")
+y2018eb <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2018_voting-backcourt-eastern-conference.html")
+y2018wf <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2018_voting-frontcourt-western-conference.html")
+y2018wb <- bref_allstar_voting("https://www.basketball-reference.com/allstar/NBA_2018_voting-backcourt-western-conference.html")
+y2018voting <- rbind(y2018ef, y2018eb, y2018wf, y2018wb)
+y2018game <- game_logs(season = 2018, season_types = "All Star") %>% 
+  mutate(namePlayer = replace(namePlayer, namePlayer == "Goran Dragic", "Goran Dragić"))
+y2018 <- y2018game %>% 
+  left_join(y2018voting, by = c("namePlayer" = "player"))
+
+```
+
